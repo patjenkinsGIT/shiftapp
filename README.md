@@ -2,16 +2,16 @@
 
 A phone-first, installable overview of SHIFT AI. Product first; the earning streams live on a second tab with no percentages or dollar figures.
 
-**Live URL:** https://patjenkinsGIT.github.io/shiftapp/
+**Live URL:** https://app.tooltaxhq.com/
 
-Nobody on the team hosts anything. There is one copy, served by GitHub Pages from this repo, and each person gets a personalized link.
+Nobody on the team hosts anything. There is one copy, served by Cloudflare Pages straight from this repo, and each person gets a personalized link.
 
 ## Team links
 
 Add `?ref=` and your SHIFT slug to the live URL:
 
 ```
-https://patjenkinsGIT.github.io/shiftapp/?ref=YOUR-SLUG
+https://app.tooltaxhq.com/?ref=YOUR-SLUG
 ```
 
 Your slug is the last part of your SHIFT invite page, `go.shiftai.club/YOUR-SLUG`. With `?ref=` present, every button on the page points at *your* invite page, the footer shows your name, and the Share button passes your link on. The page remembers the slug on that phone, so a prospect who installs it from your link keeps your attribution.
@@ -32,7 +32,7 @@ Once installed it opens full-screen with its own icon and works offline.
 
 Everything is in `index.html`. The `CONFIG` block at the top holds the default referral link, the `REF_BASE` prefix, the footer name, the contact link and the price line. Set any of the text values to `""` to hide that element.
 
-After editing `index.html`, bump `CACHE_VERSION` in `sw.js` (`v1` → `v2`) so installed copies refresh, then commit and push. GitHub Pages redeploys in about a minute.
+After editing `index.html`, bump `CACHE_VERSION` in `sw.js` (`v1` → `v2`) so installed copies refresh, then commit and push. Cloudflare redeploys in about a minute.
 
 ## Files
 
@@ -42,7 +42,7 @@ After editing `index.html`, bump `CACHE_VERSION` in `sw.js` (`v1` → `v2`) so i
 | `manifest.webmanifest` | Makes it installable (name, icon, full-screen, theme color). |
 | `sw.js` | Service worker: caches the shell for offline use. |
 | `icons/` | 192, 512 and 512-maskable PNGs. Swap for real brand icons any time; keep the names. |
-| `.nojekyll` | Tells GitHub Pages to serve the files as-is. |
+| `.nojekyll` | Harmless; keeps GitHub Pages (the fallback host) from processing the files. |
 
 ## Before sharing widely
 
