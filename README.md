@@ -46,7 +46,7 @@ Found something out of date? [Open an issue](https://github.com/patjenkinsGIT/sh
 
 ## Privacy
 
-The app has no analytics, no cookies, no ads, and no forms that send data anywhere. The only thing it stores is the SHIFT username in a copy's link, kept in your own browser (`localStorage`) so an installed copy remembers whose it is. All code is in this repo; `index.html` is the whole app.
+The app has no analytics, no cookies, no ads, and no forms that send data anywhere. It stores two things, both only in your own browser (`localStorage`): the SHIFT username from a copy's link, so an installed copy remembers whose it is, and whether you dismissed the install banner. All code is in this repo; `index.html` is the whole app.
 
 ## How attribution works
 
@@ -66,10 +66,16 @@ The app has no analytics, no cookies, no ads, and no forms that send data anywhe
 | `REFERRAL_LINK` | Default invite link when there's no `?ref=` (`go.shiftai.club/tooltaxhq`) |
 | `REF_BASE` | Prefix a username is appended to (`https://go.shiftai.club/`) |
 | `SHARED_BY` | Footer name on the default copy |
+| `VERSION` / `CHECKED_ON` | Footer line: version and the date the copy was last checked against SHIFT's pages |
+| `SOURCE_URL` | "source" link in the footer (this repo). Set to `""` to hide. |
 | `CONTACT_LINK` | "Questions first?" link, default copy only |
 | `PRICE_LINE` | Membership price line. Set to `""` to hide. |
 
-**Publish:** bump `CACHE_VERSION` in `sw.js` (for example `v6` → `v7`) so installed copies refresh, then commit and push to `main`. Cloudflare Pages redeploys automatically in about a minute.
+**Publish a new version:**
+
+1. Bump `CACHE_VERSION` in `sw.js` and `VERSION` in `CONFIG` to the same number (for example `v7` → `v8`). If you re-checked SHIFT's pages, update `CHECKED_ON` too.
+2. Commit and push to `main`. Cloudflare Pages redeploys in about a minute, and installed copies refresh on next open.
+3. Tag it: `git tag -a v8 -m "what changed"` then `git push origin v8`. Add a GitHub Release note if members should know about the change.
 
 **Hosting:** Cloudflare Pages project `shiftapp`, Git-connected to this repo; `app.tooltaxhq.com` is a proxied CNAME to `shiftapp-dmj.pages.dev`. GitHub Pages is also enabled as an unused fallback.
 
@@ -86,4 +92,8 @@ The app has no analytics, no cookies, no ads, and no forms that send data anywhe
 
 ## If it helped you
 
-It's free, no strings. If it saves you time, restamp the **"Free SHIFT walkthrough app"** card in the SHIFT Vault. Your restamped copy carries your own link.
+It's free, no strings. If it saves you time, restamping the card in the SHIFT Vault is the tip jar:
+
+**[Free SHIFT walkthrough app → restamp in the Vault](https://suite.shiftai.club/v/9ae1bbdb)**
+
+Restamping costs 10 credits, and your restamped copy carries your own link.

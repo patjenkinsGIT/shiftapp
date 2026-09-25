@@ -25,6 +25,9 @@ const CONFIG = {
   SHARED_BY:     "Tool Tax",                              // footer name for the default link ("" to hide)
   CONTACT_LINK:  "https://tooltaxhq.com",                 // "Questions first?" link, shown ONLY on the owner's link ("" to hide everywhere)
   PRICE_LINE:    "$99 / month · 20,000 credits every month · cancel anytime", // from SHIFT pricing page, Sep 25 2026; "" to hide
+  VERSION:       "v7",                                    // keep in step with CACHE_VERSION in sw.js
+  CHECKED_ON:    "Sep 25, 2026",                          // date the copy was last checked against SHIFT's own pages
+  SOURCE_URL:    "https://github.com/patjenkinsGIT/shiftapp",
 };
 </script>
 
@@ -377,6 +380,7 @@ const CONFIG = {
 
 <footer>
   <div class="wrap" id="footerLine"></div>
+  <div class="wrap small" id="versionLine" style="margin-top:6px"></div>
 </footer>
 
 <div class="install" id="installBanner" role="dialog" aria-label="Install this app">
@@ -426,6 +430,9 @@ const CONFIG = {
   else contact.remove();
   const price = document.getElementById('priceLine');
   if (CONFIG.PRICE_LINE) price.textContent = CONFIG.PRICE_LINE; else price.remove();
+  const ver = document.getElementById('versionLine');
+  if (ver) ver.innerHTML = CONFIG.VERSION + ' · checked against SHIFT\'s own pages ' + CONFIG.CHECKED_ON +
+    (CONFIG.SOURCE_URL ? ' · <a href="' + CONFIG.SOURCE_URL + '" target="_blank" rel="noopener">source</a>' : '');
   const foot = document.getElementById('footerLine');
   const sharedBy = ref ? ref : CONFIG.SHARED_BY;
   foot.innerHTML = (sharedBy ? 'Shared by <b>'+sharedBy.replace(/[<>&]/g,'')+'</b> · ' : '') +
