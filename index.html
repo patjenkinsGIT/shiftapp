@@ -23,7 +23,7 @@ const CONFIG = {
   REFERRAL_LINK: "https://go.shiftai.club/tooltaxhq",   // default invite link (used when the URL has no ?ref=)
   REF_BASE:      "https://go.shiftai.club/",            // teammates: share  <app URL>?ref=THEIR-SLUG  and this prefix is added
   SHARED_BY:     "Tool Tax",                              // footer name for the default link ("" to hide)
-  CONTACT_LINK:  "https://tooltaxhq.com",                 // "Questions first?" link ("" to hide)
+  CONTACT_LINK:  "https://tooltaxhq.com",                 // "Questions first?" link, shown ONLY on the owner's link ("" to hide everywhere)
   PRICE_LINE:    "$99 / month · 20,000 studio credits included", // verify against the current plan page; "" to hide
 };
 </script>
@@ -359,6 +359,12 @@ const CONFIG = {
     if (q && SLUG_OK.test(q)) { ref = q; try { localStorage.setItem('shiftRef', q); } catch(e){} }
     else { const s = localStorage.getItem('shiftRef'); if (s && SLUG_OK.test(s)) ref = s; }
   } catch(e){}
+  // Owner = no ?ref=, or a ?ref= matching the slug in CONFIG.REFERRAL_LINK.
+  // Owner-only extras (the "Questions first?" link, the SHARED_BY name) are hidden
+  // on teammates' links so their prospects never get routed to the owner.
+  const OWNER_SLUG = CONFIG.REFERRAL_LINK.replace(/\/+$/,'').split('/').pop().toLowerCase();
+  if (ref && ref.toLowerCase() === OWNER_SLUG) ref = '';
+  const IS_OWNER = !ref;
   const REFERRAL = ref ? CONFIG.REF_BASE + ref : CONFIG.REFERRAL_LINK;
   const APP_URL  = location.origin + location.pathname + (ref ? '?ref=' + encodeURIComponent(ref) : '');
 
@@ -367,7 +373,7 @@ const CONFIG = {
     a.href = REFERRAL; a.target='_blank'; a.rel='noopener';
   });
   const contact = document.getElementById('contactBtn');
-  if (CONFIG.CONTACT_LINK) { contact.href = CONFIG.CONTACT_LINK; contact.target='_blank'; contact.rel='noopener'; }
+  if (IS_OWNER && CONFIG.CONTACT_LINK) { contact.href = CONFIG.CONTACT_LINK; contact.target='_blank'; contact.rel='noopener'; }
   else contact.remove();
   const price = document.getElementById('priceLine');
   if (CONFIG.PRICE_LINE) price.textContent = CONFIG.PRICE_LINE; else price.remove();
