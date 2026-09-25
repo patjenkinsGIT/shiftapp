@@ -1,6 +1,6 @@
 /* Minimal offline-first service worker.
    Bump CACHE_VERSION whenever you edit index.html so phones pick up the change. */
-const CACHE_VERSION = 'shift-overview-v4';
+const CACHE_VERSION = 'shift-overview-v5';
 const SHELL = [
   './',
   './index.html',
