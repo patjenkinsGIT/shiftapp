@@ -141,6 +141,25 @@ const CONFIG = {
   nav.tabbar button.active{color:var(--fg)}
   nav.tabbar button.active svg{stroke:var(--cyan)}
 
+
+  /* member self-serve: make your own link */
+  .mine{margin:28px 0 8px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 16px;position:relative;overflow:hidden}
+  .mine::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--grad)}
+  .mine h3{font-size:19px;margin:6px 0 6px}
+  .mine p{color:var(--muted);font-size:15px}
+  .slugrow{display:flex;align-items:stretch;margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg2)}
+  .slugrow span{display:flex;align-items:center;padding:0 10px 0 12px;color:var(--dim);font-size:14px;white-space:nowrap;font-family:ui-monospace,Menlo,monospace}
+  .slugrow input{flex:1;min-width:0;background:transparent;border:0;color:var(--fg);font-size:16px;padding:14px 12px 14px 0;font-family:ui-monospace,Menlo,monospace;outline:none}
+  .slugrow:focus-within{border-color:var(--cyan)}
+  .minemsg{font-size:13px;color:#ff7a9a;margin-top:8px;min-height:1em}
+  .mineout{display:none;margin-top:14px}
+  .mineout.show{display:block}
+  .mylink{font-family:ui-monospace,Menlo,monospace;font-size:14px;background:var(--bg2);border:1px dashed var(--line);border-radius:10px;padding:12px;word-break:break-all;color:var(--cyan)}
+  .mineout .btnrow{grid-template-columns:1fr 1fr;margin-top:12px}
+  .mineout .btn{font-size:15px;padding:13px 12px}
+  .mineout .small{margin-top:10px}
+  .mineout .small a{color:var(--muted)}
+
   /* install banner */
   .install{
     display:none;position:fixed;left:12px;right:12px;bottom:calc(var(--tabbar) + env(safe-area-inset-bottom) + 12px);z-index:25;
@@ -328,6 +347,34 @@ const CONFIG = {
 
 </main>
 
+<section class="wrap" id="makeYours" hidden>
+  <div class="mine">
+    <div class="mono">SHIFT member?</div>
+    <h3>Make this app yours</h3>
+    <p>Type your SHIFT username, the part after <b>go.shiftai.club/</b> in your invite link. You get your own copy of this app where every button goes to your invite page.</p>
+    <form id="mineForm" autocomplete="off" novalidate>
+      <label class="slugrow" for="slugInput">
+        <span>go.shiftai.club/</span>
+        <input id="slugInput" name="slug" inputmode="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="yourname" aria-label="Your SHIFT username">
+      </label>
+      <div class="minemsg" id="mineMsg" role="status" aria-live="polite"></div>
+      <button class="btn" type="submit">Create my link</button>
+    </form>
+    <div class="mineout" id="mineOut">
+      <p>Your link. Send it to anyone, or open it and add it to your home screen:</p>
+      <div class="mylink" id="myLink"></div>
+      <div class="btnrow">
+        <button class="btn" type="button" id="myCopy">Copy</button>
+        <button class="btn secondary" type="button" id="myShare">Share</button>
+      </div>
+      <div class="btnrow" style="grid-template-columns:1fr">
+        <a class="btn secondary" id="myOpen" href="#">Open my copy</a>
+      </div>
+      <p class="small">Check the username first: <a id="myCheck" href="#" target="_blank" rel="noopener">this should open your invite page</a>. Once you open your copy, this phone remembers it.</p>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap" id="footerLine"></div>
 </footer>
@@ -383,6 +430,44 @@ const CONFIG = {
   const sharedBy = ref ? ref : CONFIG.SHARED_BY;
   foot.innerHTML = (sharedBy ? 'Shared by <b>'+sharedBy.replace(/[<>&]/g,'')+'</b> · ' : '') +
     '<a href="'+REFERRAL+'" target="_blank" rel="noopener">'+REFERRAL.replace(/^https?:\/\//,'')+'</a>';
+
+
+  // ---- member self-serve: build a personal ?ref= link (owner view only) ----
+  const mine = document.getElementById('makeYours');
+  if (IS_OWNER && mine) {
+    mine.hidden = false;
+    const form = document.getElementById('mineForm'), input = document.getElementById('slugInput');
+    const msg = document.getElementById('mineMsg'), out = document.getElementById('mineOut');
+    const linkEl = document.getElementById('myLink');
+    const base = location.origin + location.pathname;
+    let myUrl = '';
+    function cleanSlug(v){
+      v = (v || '').trim();
+      v = v.replace(/^https?:\/\//i,'').replace(/^go\.shiftai\.club\//i,'').replace(/[?#].*$/,'').replace(/\/+$/,'');
+      if (v.includes('/')) v = v.split('/').pop();
+      return v.replace(/^@/,'');
+    }
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const slug = cleanSlug(input.value);
+      if (!SLUG_OK.test(slug)) { msg.textContent = 'That doesn\'t look like a SHIFT username. Letters, numbers, - and _ only.'; out.classList.remove('show'); return; }
+      msg.textContent = '';
+      input.value = slug;
+      myUrl = base + '?ref=' + encodeURIComponent(slug);
+      linkEl.textContent = myUrl.replace(/^https?:\/\//,'');
+      document.getElementById('myOpen').href = myUrl;
+      document.getElementById('myCheck').href = CONFIG.REF_BASE + slug;
+      out.classList.add('show');
+    });
+    document.getElementById('myCopy').addEventListener('click', async ev => {
+      try { await navigator.clipboard.writeText(myUrl); ev.target.textContent = 'Copied'; setTimeout(()=>ev.target.textContent='Copy',1600); }
+      catch(e){ ev.target.textContent = 'Press and hold the link to copy'; }
+    });
+    document.getElementById('myShare').addEventListener('click', async () => {
+      const data = {title:'SHIFT AI walkthrough', text:'One login, one bill, every AI tool. Take a look:', url: myUrl};
+      try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(myUrl); } } catch(e){}
+    });
+  }
 
   // ---- tabs ----
   const tabs = {platform: document.getElementById('tab-platform'), earn: document.getElementById('tab-earn')};
